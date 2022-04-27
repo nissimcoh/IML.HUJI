@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import NoReturn
-from ...base import BaseEstimator
+from IMLearn.base import BaseEstimator
 import numpy as np
 from numpy.linalg import pinv
+import IMLearn.metrics.loss_functions as loss_func
 
 
 class LinearRegression(BaseEstimator):
     """
     Linear Regression Estimator
-
     Solving Ordinary Least Squares optimization problem
     """
 
@@ -49,7 +49,14 @@ class LinearRegression(BaseEstimator):
         -----
         Fits model with or without an intercept depending on value of `self.include_intercept_`
         """
-        raise NotImplementedError()
+
+        if self.include_intercept_:
+            onesRow = np.ones((X.shape[0], 1))
+            X = np.concatenate([onesRow, X], axis=1)
+        self.coefs_ = np.linalg.pinv(X) @ y
+        self.fitted_ = True
+
+
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -65,7 +72,10 @@ class LinearRegression(BaseEstimator):
         responses : ndarray of shape (n_samples, )
             Predicted responses of given samples
         """
-        raise NotImplementedError()
+        if self.include_intercept_:
+            onesRow = np.ones((X.shape[0], 1))
+            X = np.concatenate([onesRow, X], axis=1)
+        return (X @ self.coefs_)
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
@@ -84,4 +94,5 @@ class LinearRegression(BaseEstimator):
         loss : float
             Performance under MSE loss function
         """
-        raise NotImplementedError()
+        return loss_func.mean_square_error(y, self._predict(X))
+

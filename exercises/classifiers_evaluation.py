@@ -26,6 +26,10 @@ def load_dataset(filename: str) -> Tuple[np.ndarray, np.ndarray]:
         Class vector specifying for each sample its class
 
     """
+
+    dataFrame = pd.read_csv(filename)
+    dataFrame.dropna()
+
     raise NotImplementedError()
 
 
